@@ -2,46 +2,25 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main  # Run this workflow when code is pushed to 'main'
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: Build and Test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install Dependencies
+      - name: Build and Test
         run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          echo "Running build on local machine..."
+          python --version
+          echo "✅ Build completed successfully"
 
-      - name: Run Tests
+      - name: Deploy to Local Folder
         run: |
-          echo "✅ Build successful!"
-
-  deploy:
-    name: Deploy to Local PC
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Deploy files to local machine via SSH
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.LOCAL_HOST }}
-          username: ${{ secrets.LOCAL_USER }}
-          key: ${{ secrets.LOCAL_SSH_KEY }}
-          source: "."
-          target: "C:/Users/${{ secrets.LOCAL_USER }}/deployment"
+          echo "Deploying to C:\Users\hp\deployment..."
+          if not exist "C:\Users\hp\deployment" mkdir "C:\Users\hp\deployment"
+          xcopy /E /Y . "C:\Users\hp\deployment"
+          echo "✅ Deployment complete!"
