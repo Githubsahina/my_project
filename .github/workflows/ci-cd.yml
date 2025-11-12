@@ -14,13 +14,17 @@ jobs:
 
       - name: Build and Test
         run: |
-          echo "Running build on local machine..."
+          Write-Host "Running build on local machine..."
           python --version
-          echo "✅ Build completed successfully"
+          Write-Host "✅ Build completed successfully"
 
       - name: Deploy to Local Folder
+        shell: pwsh
         run: |
-          echo "Deploying to C:\Users\hp\deployment..."
-          if not exist "C:\Users\hp\deployment" mkdir "C:\Users\hp\deployment"
-          xcopy /E /Y . "C:\Users\hp\deployment"
-          echo "✅ Deployment complete!"
+          Write-Host "Deploying to C:\Users\hp\deployment..."
+          $deployPath = "C:\Users\hp\deployment"
+          if (-Not (Test-Path $deployPath)) {
+              New-Item -ItemType Directory -Force -Path $deployPath
+          }
+          Copy-Item -Path .\* -Destination $deployPath -Recurse -Force
+          Write-Host "✅ Deployment complete!"
